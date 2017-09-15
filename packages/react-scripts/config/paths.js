@@ -57,6 +57,13 @@ module.exports = {
   appIndexJs: resolveApp('src/index.js'),
   appPackageJson: resolveApp('package.json'),
   appSrc: resolveApp('src'),
+
+  /* flow specific folders begin */
+  appLibModules: resolveApp('src/lib'),
+  appModules: resolveApp('src/app'),
+  appSpecModules: resolveApp('spec'),
+  /* flow specific folders end */
+
   yarnLockFile: resolveApp('yarn.lock'),
   testsSetup: resolveApp('src/setupTests.js'),
   appNodeModules: resolveApp('node_modules'),
@@ -77,6 +84,13 @@ module.exports = {
   appIndexJs: resolveApp('src/index.js'),
   appPackageJson: resolveApp('package.json'),
   appSrc: resolveApp('src'),
+
+  /* flow specific folders begin */
+  appLibModules: resolveApp('src/lib'),
+  appModules: resolveApp('src/app'),
+  appSpecModules: resolveApp('spec'),
+  /* flow specific folders end */
+
   yarnLockFile: resolveApp('yarn.lock'),
   testsSetup: resolveApp('src/setupTests.js'),
   appNodeModules: resolveApp('node_modules'),
@@ -107,6 +121,11 @@ if (
     appIndexJs: resolveOwn('template/src/index.js'),
     appPackageJson: resolveOwn('package.json'),
     appSrc: resolveOwn('template/src'),
+    /* flow specific folders begin */
+    appLibModules: resolveApp('template/src/lib'),
+    appModules: resolveApp('template/src/app'),
+    appSpecModules: resolveApp('template/spec'),
+    /* flow specific folders end */
     yarnLockFile: resolveOwn('template/yarn.lock'),
     testsSetup: resolveOwn('template/src/setupTests.js'),
     appNodeModules: resolveOwn('node_modules'),

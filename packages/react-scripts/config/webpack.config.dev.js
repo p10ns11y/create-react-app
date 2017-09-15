@@ -13,6 +13,7 @@
 const autoprefixer = require('autoprefixer');
 const path = require('path');
 const webpack = require('webpack');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
@@ -21,6 +22,7 @@ const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
+const pathsAlias = require('./pathsAlias');
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // In development, we always serve from the root. This makes config easier.
@@ -84,7 +86,12 @@ module.exports = {
     // We placed these paths second because we want `node_modules` to "win"
     // if there are any conflicts. This matches Node resolution mechanism.
     // https://github.com/facebookincubator/create-react-app/issues/253
-    modules: ['node_modules', paths.appNodeModules].concat(
+    modules: [
+      'node_modules',
+      paths.appNodeModules,
+      paths.appLibModules,
+      paths.appModules,
+    ].concat(
       // It is guaranteed to exist because we tweak it in `env.js`
       process.env.NODE_PATH.split(path.delimiter).filter(Boolean)
     ),
@@ -95,20 +102,24 @@ module.exports = {
     // `web` extension prefixes have been added for better support
     // for React Native Web.
     extensions: ['.web.js', '.js', '.json', '.web.jsx', '.jsx'],
-    alias: {
-      // @remove-on-eject-begin
-      // Resolve Babel runtime relative to react-scripts.
-      // It usually still works on npm 3 without this but it would be
-      // unfortunate to rely on, as react-scripts could be symlinked,
-      // and thus babel-runtime might not be resolvable from the source.
-      'babel-runtime': path.dirname(
-        require.resolve('babel-runtime/package.json')
-      ),
-      // @remove-on-eject-end
-      // Support React Native Web
-      // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
-      'react-native': 'react-native-web',
-    },
+    alias: Object.assign(
+      {
+        // @remove-on-eject-begin
+        // Resolve Babel runtime relative to react-scripts.
+        // It usually still works on npm 3 without this but it would be
+        // unfortunate to rely on, as react-scripts could be symlinked,
+        // and thus babel-runtime might not be resolvable from the source.
+        'babel-runtime': path.dirname(
+          require.resolve('babel-runtime/package.json')
+        ),
+        // @remove-on-eject-end
+        // Support React Native Web
+        // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
+        'react-native': 'react-native-web',
+      },
+      pathsAlias
+    ),
+
     plugins: [
       // Prevents users from importing files from outside of src/ (or node_modules/).
       // This often causes confusion because we only process files within src/ with babel.
@@ -164,6 +175,87 @@ module.exports = {
               name: 'static/media/[name].[hash:8].[ext]',
             },
           },
+
+          // Flow custom loaders
+          { test: '/backbone.collectionsubset/', loader: 'imports?backbone' },
+          { test: '/bootstrap/', loader: 'imports?jQuery=jquery' },
+          { test: '/bootstrap-datepicker/', loader: 'imports?bootstrap' },
+          {
+            test: '/datepicker-lang-sv/',
+            loader: 'imports?bootstrap-datepicker',
+          },
+          {
+            test: '/datepicker-lang-no/',
+            loader: 'imports?bootstrap-datepicker',
+          },
+          {
+            test: '/datepicker-lang-de/',
+            loader: 'imports?bootstrap-datepicker',
+          },
+          {
+            test: '/datepicker-lang-fi/',
+            loader: 'imports?bootstrap-datepicker',
+          },
+          {
+            test: '/datepicker-lang-es/',
+            loader: 'imports?bootstrap-datepicker',
+          },
+          { test: '/bootstrap.modal/', loader: 'imports?bootstrap' },
+          { test: '/bootstrap.modalmanager/', loader: 'imports?bootstrap' },
+          // require Bootstrap first, to make sure we overwrite it's $.fn.typeahead
+          { test: '/typeahead/', loader: 'imports?jQuery=jquery,bootstrap' },
+          { test: '/select2/', loader: 'imports?jQuery=jquery' },
+          { test: '/pagination/', loader: 'imports?jQuery=jquery' },
+          { test: '/autosize/', loader: 'imports?jQuery=jquery' },
+          { test: '/highcharts/', loader: 'imports?jQuery=jquery' },
+          {
+            test: '/highcharts.more/',
+            loader: 'imports?jQuery=jquery,highcharts',
+          },
+          { test: '/fineuploader/', loader: 'imports?jQuery=jquery' },
+          {
+            test: '/media-check/',
+            loader: 'exports?mediaCheck!imports?jQuery=jquery',
+          },
+          { test: '/pusher/', loader: 'exports?Pusher!./file.js' },
+
+          {
+            test: /bootstrap-sass\/assets\/javascripts\//,
+            loader: 'imports?jQuery=jquery',
+          },
+          {
+            test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
+            loader: 'url?limit=10000&mimetype=application/font-woff',
+          },
+          {
+            test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
+            loader: 'url?limit=10000&mimetype=application/font-woff2',
+          },
+          {
+            test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
+            loader: 'url?limit=10000&mimetype=application/octet-stream',
+          },
+          {
+            test: /\.otf(\?v=\d+\.\d+\.\d+)?$/,
+            loader: 'url?limit=10000&mimetype=application/font-otf',
+          },
+          {
+            test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
+            loader: 'file',
+          },
+          {
+            test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+            loader: 'url?limit=10000&mimetype=image/svg+xml',
+          },
+          {
+            test: /\.less$/,
+            loader: ExtractTextPlugin.extract(
+              'style-loader',
+              'css-loader!postcss-loader!less-loader'
+            ),
+            exclude: /(node_modules|bower_components)/,
+          },
+
           // Process JS with Babel.
           {
             test: /\.(js|jsx)$/,
